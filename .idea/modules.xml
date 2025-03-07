@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/RouteAnalyzer.iml" filepath="$PROJECT_DIR$/RouteAnalyzer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RouteAnalyzer.main.iml" filepath="$PROJECT_DIR$/.idea/modules/RouteAnalyzer.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RouteAnalyzer.test.iml" filepath="$PROJECT_DIR$/.idea/modules/RouteAnalyzer.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/lab1-g07.iml" filepath="$PROJECT_DIR$/.idea/lab1-g07.iml" />
+    </modules>
+  </component>
+</project>
