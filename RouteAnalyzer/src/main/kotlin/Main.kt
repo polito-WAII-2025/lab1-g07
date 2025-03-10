@@ -1,5 +1,8 @@
 package org.example
 
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import java.io.File
 import kotlin.math.*
 
@@ -84,17 +87,35 @@ EVENTUALI FUNZIONI AGGIUNTIVE
 
 #############################################
  */
-
+data class CustomParameters(
+    val earthRadiusKm: Double,
+    val geofenceCenterLatitude: Double,
+    val geofenceCenterLongitude: Double,
+    val geofenceRadiusKm: Double,
+    val mostFrequentedAreaRadiusKm: Double? = null  // Optional
+)
 
 fun main() {
     val data: MutableList<Point> = mutableListOf()
-    File("waypoints.csv").forEachLine {
+    File("RouteAnalyzer/src/main/kotlin/waypoints.csv").forEachLine {
         val time=it.split(";")[0].toDouble()
         val lat=it.split(";")[1].toDouble()
         val lon=it.split(";")[2].toDouble()
         data.add(Point(time,lat,lon))
     }
-    //println(data)
+
+
+    val file = File("RouteAnalyzer/src/main/custom-parameters.yml")
+    val mapper = YAMLMapper().registerKotlinModule()
+    val params: CustomParameters = mapper.readValue(file)
+
+    println("Earth Radius: ${params.earthRadiusKm} km")
+    println("Geofence Center: (${params.geofenceCenterLatitude}, ${params.geofenceCenterLongitude})")
+    println("Geofence Radius: ${params.geofenceRadiusKm} km")
+    println("Most Frequented Area Radius: ${params.mostFrequentedAreaRadiusKm ?: "Not defined"} km")
+
+
+//println(data)
     val maxDistance=maxDistanceFromStart(data)
     println(maxDistance)
 
