@@ -56,7 +56,7 @@ data class Area(val centralWaypoint: Waypoint, val areaRadiusKm: Double, var ent
 fun mostFrequentedArea(points: List<Waypoint>, maxDistance: Double): Area{
     // calcolo raggio dell'area
     //prenderlo come parametro o calcolarlo come: maxDistance/10
-    val radius=maxDistance/10;
+    val radius=maxDistance/10
     ////////////////////////
 
     //supposizione: l'area più frequentata deve avere come centro uno dei punti percorsi
