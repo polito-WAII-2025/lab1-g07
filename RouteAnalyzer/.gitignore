@@ -1,0 +1,29 @@
+# Gradle-specific files
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar  # Mantieni solo il wrapper per garantire compatibilità
+gradle-app.setting
+
+# IntelliJ IDEA / Android Studio
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+*.class
+*.log
+
+# OS-generated files (macOS, Windows, Linux)
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Kotlin compilation output
+*.kts~
+*.log
+*.swp
+*.swo
+
+# Dependency caches
+**/node_modules/
+**/.gradle/
