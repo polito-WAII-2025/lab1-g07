@@ -11,9 +11,9 @@ import kotlin.math.*
 @Serializable
 data class Waypoint(val timestamp: Double, val latitude: Double, val longitude: Double)
 
-fun distance(point1: Waypoint, point2: Waypoint): Double {
+fun distance(point1: Waypoint, point2: Waypoint, earthRadius : Double): Double {
     //formula di harvesine --> considero terra sferica
-    val R = 6371.0 // Raggio medio della Terra in km //PARAMETRO DA GESTIRE
+    //val R = 6371.0 // Raggio medio della Terra in km //PARAMETRO DA GESTIRE
     val lat1Rad = Math.toRadians(point1.latitude)
     val lon1Rad = Math.toRadians(point1.longitude)
     val lat2Rad = Math.toRadians(point2.latitude)
@@ -25,20 +25,20 @@ fun distance(point1: Waypoint, point2: Waypoint): Double {
     val a = sin(dlat / 2).pow(2) + cos(lat1Rad) * cos(lat2Rad) * sin(dlon / 2).pow(2)
     val c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
-    return R * c    //distanza in km tra i due punti
+    return earthRadius * c    //distanza in km tra i due punti
 }
 
 @Serializable
 data class MaxDistanceFromStart(val waypoint: Waypoint, val distanceKm: Double)
 
-fun maxDistanceFromStart(points : List<Waypoint>) : MaxDistanceFromStart {
+fun maxDistanceFromStart(points : List<Waypoint>, earthRadius: Double ) : MaxDistanceFromStart {
     var maxDistance= 0.0
     var maxDistantPoint=points[0]
     // the start point is the point with the lower timestamp
     val startPoint=points.reduce{pointA,pointB-> if(pointA.timestamp<=pointB.timestamp) pointA else pointB }
     for(point in points){
-        if(distance(startPoint,point)>maxDistance){
-            maxDistance= distance(startPoint,point)
+        if(distance(startPoint,point,earthRadius)>maxDistance){
+            maxDistance= distance(startPoint,point,earthRadius)
             maxDistantPoint=point
         }
     }
@@ -53,10 +53,15 @@ fun maxDistanceFromStart(points : List<Waypoint>) : MaxDistanceFromStart {
 @Serializable
 data class Area(val centralWaypoint: Waypoint, val areaRadiusKm: Double, var entriesCount: Int=0)
 
-fun mostFrequentedArea(points: List<Waypoint>, maxDistance: Double): Area{
+fun mostFrequentedArea(points: List<Waypoint>, maxDistance: Double, frequentedAreaRadius:Double?, earthRadius: Double): Area{
     // calcolo raggio dell'area
     //prenderlo come parametro o calcolarlo come: maxDistance/10
-    val radius=maxDistance/10
+    var radius: Double
+    if(frequentedAreaRadius != null){
+        radius=frequentedAreaRadius
+    }else {
+        radius = maxDistance / 10
+    }
     ////////////////////////
 
     //supposizione: l'area più frequentata deve avere come centro uno dei punti percorsi
@@ -67,7 +72,7 @@ fun mostFrequentedArea(points: List<Waypoint>, maxDistance: Double): Area{
     for (center in points){
         counter=0
         for(point in points){
-            if(distance(center,point)<=radius){
+            if(distance(center,point, earthRadius)<=radius){
                 counter++
             }
         }
@@ -82,8 +87,10 @@ fun mostFrequentedArea(points: List<Waypoint>, maxDistance: Double): Area{
 @Serializable
 data class WaypointsOutsideGeofence(val centralWaypoint: Waypoint, val areaRadiusKm: Double, val count: Int, val waypoints: List<Waypoint>)
 
-fun waypointsOutsideGeofence(points: List<Waypoint>, fenceArea: Area): List<Waypoint>{
-    return points.filter{point-> distance(point,fenceArea.centralWaypoint)>fenceArea.areaRadiusKm }
+fun waypointsOutsideGeofence(points: List<Waypoint>, fenceArea: Area, earthRadius: Double): WaypointsOutsideGeofence{
+
+    val outsidePoints= points.filter{point-> distance(point,fenceArea.centralWaypoint,earthRadius)>fenceArea.areaRadiusKm }
+    return WaypointsOutsideGeofence(fenceArea.centralWaypoint,fenceArea.areaRadiusKm,outsidePoints.size,outsidePoints)
 }
 
 /*
@@ -135,23 +142,22 @@ fun main() {
 
     //println(data)
 
-    val maxDistanceFromStart = maxDistanceFromStart(data)
-    println("maxDistance: ")
-    println(maxDistanceFromStart)
+    val maxDistanceFromStart = maxDistanceFromStart(data, params.earthRadiusKm)
+    /*println("maxDistance: ")
+    println(maxDistanceFromStart)*/
 
     /*val (maxDistance, maxDistantPoint) = maxDistanceFromStart(data)
     println("Max distance from start: $maxDistance km, at point: $maxDistantPoint")*/
 
-    val mostFrequentedArea = mostFrequentedArea(data, maxDistanceFromStart.distanceKm)
-    println("Most frequented area: center = ${mostFrequentedArea.centralWaypoint}, radius = ${mostFrequentedArea.areaRadiusKm}, entries = ${mostFrequentedArea.entriesCount}")
-    println(mostFrequentedArea)
+    val mostFrequentedArea = mostFrequentedArea(data, maxDistanceFromStart.distanceKm,params.mostFrequentedAreaRadiusKm, params.earthRadiusKm)
+    /*println("Most frequented area: center = ${mostFrequentedArea.centralWaypoint}, radius = ${mostFrequentedArea.areaRadiusKm}, entries = ${mostFrequentedArea.entriesCount}")
+    println(mostFrequentedArea)*/
 
-    // DA RIVEDERE BENE
-    val outsidePoints = waypointsOutsideGeofence(data, mostFrequentedArea)
-    println("Waypoints outside geofence: ${outsidePoints.size}")
-    outsidePoints.forEach { println(it) }
+    val waypointsOutsideGeofence = waypointsOutsideGeofence(data, Area(Waypoint(0.0,params.geofenceCenterLatitude,params.geofenceCenterLongitude),params.geofenceRadiusKm),params.earthRadiusKm)
+    /*println("Waypoints outside geofence: ${outsidePoints.size}")
+    outsidePoints.forEach { println(it) }*/
 
-    val waypointsOutsideGeofence = WaypointsOutsideGeofence(mostFrequentedArea.centralWaypoint, mostFrequentedArea.areaRadiusKm, outsidePoints.size, outsidePoints)
+    //val waypointsOutsideGeofence = WaypointsOutsideGeofence(mostFrequentedArea.centralWaypoint, mostFrequentedArea.areaRadiusKm, outsidePoints.size, outsidePoints)
 
     val output = OutputData(maxDistanceFromStart, mostFrequentedArea, waypointsOutsideGeofence)
 
