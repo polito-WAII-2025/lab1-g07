@@ -120,9 +120,9 @@ data class OutputData(
     val waypointsOutsideGeofence: WaypointsOutsideGeofence
 )
 
-fun main() {
+fun main(args: Array<String>) {
     val data: MutableList<Waypoint> = mutableListOf()
-    File("src/main/kotlin/waypoints.csv").forEachLine {
+    File("./waypoints.csv").forEachLine { // src/main/kotlin/waypoints.csv
         val time=it.split(";")[0].toDouble()
         val lat=it.split(";")[1].toDouble()
         val lon=it.split(";")[2].toDouble()
@@ -130,7 +130,13 @@ fun main() {
     }
 
 
-    val file = File("src/main/custom-parameters.yml")
+    //val file = File("./custom-parameters.yml") // src/main/custom-parameters.yml
+    val filePath = if (args.isNotEmpty()) args[0] else "custom-parameters.yml"
+    val file = File(filePath)
+    if (!file.exists()) {
+        println("Errore: Il file di configurazione '$filePath' non esiste!")
+        return
+    }
     val mapper = YAMLMapper().registerKotlinModule()
     val params: CustomParameters = mapper.readValue(file)
 
@@ -143,27 +149,30 @@ fun main() {
     //println(data)
 
     val maxDistanceFromStart = maxDistanceFromStart(data, params.earthRadiusKm)
-    /*println("maxDistance: ")
-    println(maxDistanceFromStart)*/
+    println("maxDistance: ")
+    println(maxDistanceFromStart)
 
     /*val (maxDistance, maxDistantPoint) = maxDistanceFromStart(data)
     println("Max distance from start: $maxDistance km, at point: $maxDistantPoint")*/
 
     val mostFrequentedArea = mostFrequentedArea(data, maxDistanceFromStart.distanceKm,params.mostFrequentedAreaRadiusKm, params.earthRadiusKm)
-    /*println("Most frequented area: center = ${mostFrequentedArea.centralWaypoint}, radius = ${mostFrequentedArea.areaRadiusKm}, entries = ${mostFrequentedArea.entriesCount}")
-    println(mostFrequentedArea)*/
+    println("Most frequented area: center = ${mostFrequentedArea.centralWaypoint}, radius = ${mostFrequentedArea.areaRadiusKm}, entries = ${mostFrequentedArea.entriesCount}")
+    /*println(mostFrequentedArea)*/
 
     val waypointsOutsideGeofence = waypointsOutsideGeofence(data, Area(Waypoint(0.0,params.geofenceCenterLatitude,params.geofenceCenterLongitude),params.geofenceRadiusKm),params.earthRadiusKm)
     /*println("Waypoints outside geofence: ${outsidePoints.size}")
     outsidePoints.forEach { println(it) }*/
+    println("Waypoints outside geofence: GFcenter= ${waypointsOutsideGeofence.centralWaypoint}, GFradius= ${waypointsOutsideGeofence.areaRadiusKm}, count= ${waypointsOutsideGeofence.count}")
 
     //val waypointsOutsideGeofence = WaypointsOutsideGeofence(mostFrequentedArea.centralWaypoint, mostFrequentedArea.areaRadiusKm, outsidePoints.size, outsidePoints)
 
     val output = OutputData(maxDistanceFromStart, mostFrequentedArea, waypointsOutsideGeofence)
 
     val jsonOutput = Json.encodeToString(OutputData.serializer(), output)
+    println("Output:")
+    println(jsonOutput)
 
-    File("src/main/kotlin/output.json").writeText(jsonOutput)
+    File("./output.json").writeText(jsonOutput) //src/main/kotlin/output.json
 
 
 }
