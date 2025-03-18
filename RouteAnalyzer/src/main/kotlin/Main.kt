@@ -98,12 +98,19 @@ fun totalDistance(points: List<Waypoint>, earthRadius: Double): Double{
     return points.asSequence().zip(points.asSequence().drop(1)).map { (pointA,pointB) -> distance(pointA,pointB,earthRadius) }.sum()
 }
 
+// velocità media calcolata in km/h
+fun avgVelocity(points: List<Waypoint>, earthRadius: Double): Double{
+    val totalDistance = totalDistance(points, earthRadius)
+    val totalTime = (points.last().timestamp - points.first().timestamp)/(1000*3600)
+    // timestamp è in millis -> converto in ore
+    return totalDistance / totalTime
+}
 /*
 ############################################
 EVENTUALI FUNZIONI AGGIUNTIVE
 
 - distanza totale percorsa: fatta
-- velocita media durante il percoso
+- velocita media durante il percoso: fatta
 - tempo totale (gia nel frontend)
 - numero cambi di direzione bruschi
 - direzione dello spostamento (punti cardinali) ?????
@@ -172,7 +179,10 @@ fun main(args: Array<String>) {
     //val waypointsOutsideGeofence = WaypointsOutsideGeofence(mostFrequentedArea.centralWaypoint, mostFrequentedArea.areaRadiusKm, outsidePoints.size, outsidePoints)
 
     val totDist = totalDistance(data, params.earthRadiusKm)
-    println("total distance: $totDist")
+    println("total distance: $totDist km")
+
+    val avgVel = avgVelocity(data, params.earthRadiusKm)
+    println("avg velocity: $avgVel km/h")
 
     val output = OutputData(maxDistanceFromStart, mostFrequentedArea, waypointsOutsideGeofence)
 
