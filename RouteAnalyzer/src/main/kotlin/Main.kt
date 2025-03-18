@@ -93,11 +93,16 @@ fun waypointsOutsideGeofence(points: List<Waypoint>, fenceArea: Area, earthRadiu
     return WaypointsOutsideGeofence(fenceArea.centralWaypoint,fenceArea.areaRadiusKm,outsidePoints.size,outsidePoints)
 }
 
+fun totalDistance(points: List<Waypoint>, earthRadius: Double): Double{
+
+    return points.asSequence().zip(points.asSequence().drop(1)).map { (pointA,pointB) -> distance(pointA,pointB,earthRadius) }.sum()
+}
+
 /*
 ############################################
 EVENTUALI FUNZIONI AGGIUNTIVE
 
-- distanza totale percorsa
+- distanza totale percorsa: fatta
 - velocita media durante il percoso
 - tempo totale (gia nel frontend)
 - numero cambi di direzione bruschi
@@ -165,6 +170,9 @@ fun main(args: Array<String>) {
     println("Waypoints outside geofence: GFcenter= ${waypointsOutsideGeofence.centralWaypoint}, GFradius= ${waypointsOutsideGeofence.areaRadiusKm}, count= ${waypointsOutsideGeofence.count}")
 
     //val waypointsOutsideGeofence = WaypointsOutsideGeofence(mostFrequentedArea.centralWaypoint, mostFrequentedArea.areaRadiusKm, outsidePoints.size, outsidePoints)
+
+    val totDist = totalDistance(data, params.earthRadiusKm)
+    println("total distance: $totDist")
 
     val output = OutputData(maxDistanceFromStart, mostFrequentedArea, waypointsOutsideGeofence)
 
