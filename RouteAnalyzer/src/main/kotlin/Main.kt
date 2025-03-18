@@ -93,18 +93,100 @@ fun waypointsOutsideGeofence(points: List<Waypoint>, fenceArea: Area, earthRadiu
     return WaypointsOutsideGeofence(fenceArea.centralWaypoint,fenceArea.areaRadiusKm,outsidePoints.size,outsidePoints)
 }
 
+/* ADVANCED FUNCTIONS */
+
 /*
 ############################################
 EVENTUALI FUNZIONI AGGIUNTIVE
 
-- distanza totale percorsa
-- velocita media durante il percoso
-- tempo totale (gia nel frontend)
-- numero cambi di direzione bruschi
+- distanza totale percorsa OK
+- velocita media durante il percorso OK
+- ---tempo totale (gia nel frontend)---
+- numero cambi di direzione bruschi (angoli > 45°)
 - direzione dello spostamento (punti cardinali) ?????
 
 #############################################
  */
+
+@Serializable
+data class outputDataAdvanced (
+    val totalDistanceKm: Double,
+    val averageVelocityKmH: Double,
+    val movingDirection: String,
+    val sharpTurns: SharpTurns
+)
+
+//fun totalDistance(points: List<Waypoint>, earthRadius: Double): Double {
+//    var totalDistance = 0.0
+//    for (i in 0 until points.size - 1) {
+//        totalDistance += distance(points[i], points[i + 1], earthRadius)
+//    }
+//    return totalDistance
+//}
+
+fun totalDistanceKm(points: List<Waypoint>, earthRadius: Double): Double{
+
+    return points.asSequence().zip(points.asSequence().drop(1)).map { (pointA,pointB) -> distance(pointA,pointB,earthRadius) }.sum()
+}
+
+//fun averageVelocity(points: List<Waypoint>, earthRadius: Double): Double{
+//    return totalDistance(points, earthRadius)/(points[points.size-1].timestamp-points[0].timestamp)
+//}
+fun avgVelocity(points: List<Waypoint>, earthRadius: Double): Double{
+    val totalDistance = totalDistanceKm(points, earthRadius)
+    val totalTime = (points.last().timestamp - points.first().timestamp)/(1000*3600)
+    println(points.last())
+    println(points.first())
+    println(points.last().timestamp - points.first().timestamp)
+    println(totalTime)
+
+    // timestamp è in millis -> converto in ore
+    return totalDistance / totalTime
+}
+
+@Serializable
+data class SharpTurns(val sharpTurnsCount: Int, val sharpTurnPoints: List<Waypoint>)
+
+fun sharpTurns(points: List<Waypoint>): SharpTurns{
+    var sharpTurns=0
+    var sharpTurnPoints : MutableList<Waypoint> = mutableListOf()
+
+    for (i in 0 until points.size - 2) {
+        val angle = atan2(points[i+1].latitude-points[i].latitude, points[i+1].longitude-points[i].longitude) - atan2(points[i+2].latitude-points[i+1].latitude, points[i+2].longitude-points[i+1].longitude)
+        if (angle > PI/4 || angle < -PI/4) {
+            // add point that makes a sharp turn to a list
+            sharpTurnPoints += points[i+1]
+            sharpTurns++
+        }
+    }
+    return SharpTurns(sharpTurns, sharpTurnPoints)
+}
+
+fun movingDirection(points: List<Waypoint>): String{
+    val angle = atan2(points[points.size-1].latitude-points[0].latitude, points[points.size-1].longitude-points[0].longitude)
+    if (angle > -PI/8 && angle < PI/8) {
+        return "East"
+    } else if (angle > PI/8 && angle < 3*PI/8) {
+        return "North-East"
+    } else if (angle > 3*PI/8 && angle < 5*PI/8) {
+        return "North"
+    } else if (angle > 5*PI/8 && angle < 7*PI/8) {
+        return "North-West"
+    } else if (angle > 7*PI/8 || angle < -7*PI/8) {
+        return "West"
+    } else if (angle > -7*PI/8 && angle < -5*PI/8) {
+        return "South-West"
+    } else if (angle > -5*PI/8 && angle < -3*PI/8) {
+        return "South"
+    } else {
+        return "South-East"
+    }
+}
+
+/* END OF ADVANCED FUNCTIONS */
+
+
+
 data class CustomParameters(
     val earthRadiusKm: Double,
     val geofenceCenterLatitude: Double,
@@ -172,7 +254,30 @@ fun main(args: Array<String>) {
     println("Output:")
     println(jsonOutput)
 
-    File("./output/output.json").writeText(jsonOutput) //src/main/kotlin/output.json
+    File("./output/output.json").writeText(jsonOutput)
 
+    /* ADVANCED FUNCTIONS */
+
+    val totalDistanceKm = totalDistanceKm(data, params.earthRadiusKm)
+    println("Total distance: $totalDistanceKm km")
+
+    val averageVelocity = avgVelocity(data, params.earthRadiusKm)
+    println("Average velocity: $averageVelocity km/h")
+
+    val sharpTurns = sharpTurns(data)
+    println("Sharp turns: ${sharpTurns.sharpTurnsCount}")
+    println("Sharp turn points: ${sharpTurns.sharpTurnPoints}")
+
+    val movingDirection = movingDirection(data)
+    println("Moving direction: $movingDirection")
+
+
+    val outputAdvanced = outputDataAdvanced(totalDistanceKm, averageVelocity, movingDirection, sharpTurns)
+
+    val jsonOutputAdvanced = Json.encodeToString(outputDataAdvanced.serializer(), outputAdvanced)
+    println("Output Advanced:")
+    println(jsonOutputAdvanced)
+
+    File("./output/output_advanced.json").writeText(jsonOutputAdvanced)
 
 }

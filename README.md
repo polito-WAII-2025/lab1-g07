@@ -9,7 +9,7 @@ This repository contains a Dockerfile to build and run the **Route Analyzer** ap
 
 Make sure you have the following tools installed:
 
-- [Docker](https://www.docker.com/get-started)
+- [Docker Desktop](https://www.docker.com/get-started)
 
 ## Build the .jar file
 
