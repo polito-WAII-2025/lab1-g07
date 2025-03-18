@@ -11,6 +11,14 @@ Make sure you have the following tools installed:
 
 - [Docker](https://www.docker.com/get-started)
 
+## Build the .jar file
+
+To build the .jar file, run the following command in the project directory:
+
+```bash
+./gradlew build
+```
+
 ## Build the Docker Image
 
 To build the Docker image, run the following command in the project directory where the Dockerfile is located:
@@ -22,8 +30,8 @@ docker build -t route-analyzer .
 ## Run the Docker Image
 
 To run the Docker image, run the following command 
-in the project directory where the input file is located:
+in the directory where the input file is located:
 
 ```bash
-docker run -v ${pwd}/custom-parameters.yml:/app/custom-parameters.yml route-analyzer
+docker run -v ${pwd}/output:/app/output -v ${pwd}/custom-parameters.yml:/app/custom-parameters.yml route-analyzer
 ```

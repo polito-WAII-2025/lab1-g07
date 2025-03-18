@@ -172,7 +172,7 @@ fun main(args: Array<String>) {
     println("Output:")
     println(jsonOutput)
 
-    File("./output.json").writeText(jsonOutput) //src/main/kotlin/output.json
+    File("./output/output.json").writeText(jsonOutput) //src/main/kotlin/output.json
 
 
 }
