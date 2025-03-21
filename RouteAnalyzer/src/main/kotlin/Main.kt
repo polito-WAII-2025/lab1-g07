@@ -141,7 +141,7 @@ fun avgVelocity(points: List<Waypoint>, earthRadius: Double): Double{
     println(totalTime)
 
     // timestamp è in millis -> converto in ore
-    return totalDistance / totalTime
+    return (totalDistance / totalTime)/1000 // Compenso timestamp
 }
 
 @Serializable
