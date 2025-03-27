@@ -1,0 +1,125 @@
+{
+  "totalDistanceKm": 5.873210195022796,
+  "averageVelocityKmH": 22.393005496563415,
+  "movingDirection": "South-East",
+  "sharpTurns": {
+    "sharpTurnsCount": 23,
+    "sharpTurnPoints": [
+      {
+        "timestamp": 1.7413551798187505E12,
+        "latitude": 45.06219,
+        "longitude": 7.677
+      },
+      {
+        "timestamp": 1.741355179833501E12,
+        "latitude": 45.0627,
+        "longitude": 7.67628
+      },
+      {
+        "timestamp": 1.741355179863002E12,
+        "latitude": 45.0615,
+        "longitude": 7.67493
+      },
+      {
+        "timestamp": 1.741355179892503E12,
+        "latitude": 45.06207,
+        "longitude": 7.67277
+      },
+      {
+        "timestamp": 1.7413551799957563E12,
+        "latitude": 45.05749,
+        "longitude": 7.66813
+      },
+      {
+        "timestamp": 1.7413551800400078E12,
+        "latitude": 45.05902,
+        "longitude": 7.66544
+      },
+      {
+        "timestamp": 1.7413551800695088E12,
+        "latitude": 45.06044,
+        "longitude": 7.66509
+      },
+      {
+        "timestamp": 1.7413551800788E12,
+        "latitude": 45.0607,
+        "longitude": 7.66437
+      },
+      {
+        "timestamp": 1.7413551801134338E12,
+        "latitude": 45.05989,
+        "longitude": 7.66665
+      },
+      {
+        "timestamp": 1.7413551801480676E12,
+        "latitude": 45.05874,
+        "longitude": 7.66532
+      },
+      {
+        "timestamp": 1.7413551801827014E12,
+        "latitude": 45.05912,
+        "longitude": 7.66332
+      },
+      {
+        "timestamp": 1.7413551802909998E12,
+        "latitude": 45.05469,
+        "longitude": 7.65845
+      },
+      {
+        "timestamp": 1.7413551803043557E12,
+        "latitude": 45.05471,
+        "longitude": 7.65945
+      },
+      {
+        "timestamp": 1.7413551803177117E12,
+        "latitude": 45.05411,
+        "longitude": 7.65983
+      },
+      {
+        "timestamp": 1.7413551803444236E12,
+        "latitude": 45.0525,
+        "longitude": 7.6587
+      },
+      {
+        "timestamp": 1.7413551804245593E12,
+        "latitude": 45.05014,
+        "longitude": 7.6652
+      },
+      {
+        "timestamp": 1.741355180491339E12,
+        "latitude": 45.0531,
+        "longitude": 7.66921
+      },
+      {
+        "timestamp": 1.7413551805031921E12,
+        "latitude": 45.05331,
+        "longitude": 7.66837
+      },
+      {
+        "timestamp": 1.7413551805031921E12,
+        "latitude": 45.05331,
+        "longitude": 7.66837
+      },
+      {
+        "timestamp": 1.7413551805182053E12,
+        "latitude": 45.05261,
+        "longitude": 7.66758
+      },
+      {
+        "timestamp": 1.7413551805332185E12,
+        "latitude": 45.05199,
+        "longitude": 7.66789
+      },
+      {
+        "timestamp": 1.741355180653324E12,
+        "latitude": 45.05393,
+        "longitude": 7.67554
+      },
+      {
+        "timestamp": 1.7413551806983635E12,
+        "latitude": 45.05647,
+        "longitude": 7.6766
+      }
+    ]
+  }
+}

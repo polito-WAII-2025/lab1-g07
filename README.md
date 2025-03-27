@@ -7,7 +7,7 @@ This repository contains a Dockerfile to build and run the **Route Analyzer** ap
 
 ## Prerequisites
 
-Make sure you have the following tools installed:
+Make sure you have the following tools installed and running:
 
 - [Docker Desktop](https://www.docker.com/get-started)
 

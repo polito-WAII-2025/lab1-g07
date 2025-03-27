@@ -13,7 +13,6 @@ data class Waypoint(val timestamp: Double, val latitude: Double, val longitude: 
 
 fun distance(point1: Waypoint, point2: Waypoint, earthRadius : Double): Double {
     //formula di harvesine --> considero terra sferica
-    //val R = 6371.0 // Raggio medio della Terra in km //PARAMETRO DA GESTIRE
     val lat1Rad = Math.toRadians(point1.latitude)
     val lon1Rad = Math.toRadians(point1.longitude)
     val lat2Rad = Math.toRadians(point2.latitude)
@@ -42,9 +41,7 @@ fun maxDistanceFromStart(points : List<Waypoint>, earthRadius: Double ) : MaxDis
             maxDistantPoint=point
         }
     }
-    ///////////////////////////
-    //bisogna tornare anche il punto a cui si riferisce la distanza
-    ////////////////////////////
+
     val maxDistanceFromStart = MaxDistanceFromStart(maxDistantPoint, maxDistance)
 
     return maxDistanceFromStart
@@ -93,17 +90,16 @@ fun waypointsOutsideGeofence(points: List<Waypoint>, fenceArea: Area, earthRadiu
     return WaypointsOutsideGeofence(fenceArea.centralWaypoint,fenceArea.areaRadiusKm,outsidePoints.size,outsidePoints)
 }
 
-/* ADVANCED FUNCTIONS */
 
 /*
 ############################################
-EVENTUALI FUNZIONI AGGIUNTIVE
+ADVANCED FUNCTIONS
 
 - distanza totale percorsa OK
 - velocita media durante il percorso OK
 - ---tempo totale (gia nel frontend)---
-- numero cambi di direzione bruschi (angoli > 45°)
-- direzione dello spostamento (punti cardinali) ?????
+- numero cambi di direzione bruschi (angoli > 45°) OK
+- direzione dello spostamento (punti cardinali) OK
 
 #############################################
  */
@@ -116,31 +112,21 @@ data class outputDataAdvanced (
     val sharpTurns: SharpTurns
 )
 
-//fun totalDistance(points: List<Waypoint>, earthRadius: Double): Double {
-//    var totalDistance = 0.0
-//    for (i in 0 until points.size - 1) {
-//        totalDistance += distance(points[i], points[i + 1], earthRadius)
-//    }
-//    return totalDistance
-//}
 
 fun totalDistanceKm(points: List<Waypoint>, earthRadius: Double): Double{
 
     return points.asSequence().zip(points.asSequence().drop(1)).map { (pointA,pointB) -> distance(pointA,pointB,earthRadius) }.sum()
 }
 
-//fun averageVelocity(points: List<Waypoint>, earthRadius: Double): Double{
-//    return totalDistance(points, earthRadius)/(points[points.size-1].timestamp-points[0].timestamp)
-//}
+
 fun avgVelocity(points: List<Waypoint>, earthRadius: Double): Double{
     val totalDistance = totalDistanceKm(points, earthRadius)
-    val totalTime = (points.last().timestamp - points.first().timestamp)/(1000*3600)
+    val totalTime = (points.last().timestamp - points.first().timestamp)/(1000*3600) // timestamp è in millis -> converto in ore
     println(points.last())
     println(points.first())
     println(points.last().timestamp - points.first().timestamp)
     println(totalTime)
 
-    // timestamp è in millis -> converto in ore
     return (totalDistance / totalTime)/1000 // Compenso timestamp
 }
 
@@ -204,7 +190,7 @@ data class OutputData(
 
 fun main(args: Array<String>) {
     val data: MutableList<Waypoint> = mutableListOf()
-    File("./waypoints.csv").forEachLine { // src/main/kotlin/waypoints.csv
+    File("./waypoints.csv").forEachLine {
         val time=it.split(";")[0].toDouble()
         val lat=it.split(";")[1].toDouble()
         val lon=it.split(";")[2].toDouble()
@@ -212,7 +198,6 @@ fun main(args: Array<String>) {
     }
 
 
-    //val file = File("./custom-parameters.yml") // src/main/custom-parameters.yml
     val filePath = if (args.isNotEmpty()) args[0] else "custom-parameters.yml"
     val file = File(filePath)
     if (!file.exists()) {
@@ -228,25 +213,16 @@ fun main(args: Array<String>) {
     println("Most Frequented Area Radius: ${params.mostFrequentedAreaRadiusKm ?: "Not defined"} km")
 
 
-    //println(data)
-
     val maxDistanceFromStart = maxDistanceFromStart(data, params.earthRadiusKm)
     println("maxDistance: ")
     println(maxDistanceFromStart)
 
-    /*val (maxDistance, maxDistantPoint) = maxDistanceFromStart(data)
-    println("Max distance from start: $maxDistance km, at point: $maxDistantPoint")*/
-
     val mostFrequentedArea = mostFrequentedArea(data, maxDistanceFromStart.distanceKm,params.mostFrequentedAreaRadiusKm, params.earthRadiusKm)
     println("Most frequented area: center = ${mostFrequentedArea.centralWaypoint}, radius = ${mostFrequentedArea.areaRadiusKm}, entries = ${mostFrequentedArea.entriesCount}")
-    /*println(mostFrequentedArea)*/
 
     val waypointsOutsideGeofence = waypointsOutsideGeofence(data, Area(Waypoint(0.0,params.geofenceCenterLatitude,params.geofenceCenterLongitude),params.geofenceRadiusKm),params.earthRadiusKm)
-    /*println("Waypoints outside geofence: ${outsidePoints.size}")
-    outsidePoints.forEach { println(it) }*/
     println("Waypoints outside geofence: GFcenter= ${waypointsOutsideGeofence.centralWaypoint}, GFradius= ${waypointsOutsideGeofence.areaRadiusKm}, count= ${waypointsOutsideGeofence.count}")
 
-    //val waypointsOutsideGeofence = WaypointsOutsideGeofence(mostFrequentedArea.centralWaypoint, mostFrequentedArea.areaRadiusKm, outsidePoints.size, outsidePoints)
 
     val output = OutputData(maxDistanceFromStart, mostFrequentedArea, waypointsOutsideGeofence)
 
